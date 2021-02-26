@@ -1,0 +1,6 @@
+{
+  "port": 5000,
+  "mongoURI": "mongodb+srv://mongoUser:mongoPass@cluster0.fixv1.mongodb.net/books",
+  "jwtSecret": "secretCode",
+  "baseUrl": "http://localhost:5000"
+}
