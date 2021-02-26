@@ -28,6 +28,10 @@ export const CreatePage = () => {
         clearError()
     }, [error, message,clearError])
 
+    //fix css and design after start page (labels + names)
+    useEffect(()=> {
+        window.M.updateTextFields()
+    })
 
     const changeHandler = event => {
         setForm({...form, [event.target.name]: event.target.value})
@@ -40,8 +44,7 @@ export const CreatePage = () => {
                    Authorization: `Bearer ${auth.token}`
                })
                 message(data.message)
-
-                //history.push(`/detail/${data.link._id}`)
+                history.push(`/detail/${data.newBook._id}`)
             } catch (e) {}
     }
 

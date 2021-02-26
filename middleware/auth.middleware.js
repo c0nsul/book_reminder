@@ -16,6 +16,12 @@ module.exports = (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, config.get('jwtSecret'))
+
+        const expirationTime = (decoded.exp * 1000) - 360000
+        if (Date.now() >= expirationTime) {
+            return res.status(401).json({message: 'Authentication timeout'})
+        }
+
         //save decoded token to req
         req.user = decoded
         //app continue working
