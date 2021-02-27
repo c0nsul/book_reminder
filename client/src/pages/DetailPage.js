@@ -3,26 +3,26 @@ import {useParams} from 'react-router-dom'
 import {useHttp} from "../hooks/http.hook"
 import {AuthContext} from "../context/AuthContext"
 import {Loader} from "../components/Loader"
-import {LinkCard} from "../components/LinkCard";
+import {BookCard} from "../components/BookCard"
 
 export const DetailPage = () => {
     const {token} = useContext(AuthContext)
     const {request, loading} = useHttp()
-    const [link, setLink] = useState(null)
-    const linkId = useParams().id
+    const [book, setBook] = useState(null)
+    const bookId = useParams().id
 
-    const getLink = useCallback(async ()=>{
+    const getBook = useCallback(async ()=>{
         try {
-            const fetched=  await request(`/api/link/${linkId}`, 'GET', null, {
+            const fetched=  await request(`/api/book/${bookId}`, 'GET', null, {
                 Authorization: `Bearer ${token}`
             })
-            setLink(fetched)
+            setBook(fetched)
         } catch (e) {}
-    }, [token, linkId, request])
+    }, [token, bookId, request])
 
     useEffect(() => {
-        getLink()
-    }, [getLink])
+        getBook()
+    }, [getBook])
 
     if(loading) {
         return <Loader />
@@ -30,7 +30,7 @@ export const DetailPage = () => {
 
     return (
         <>
-            {!loading && link && <LinkCard link={link} />}
+            {!loading && book && <BookCard book={book} />}
         </>
     )
 }

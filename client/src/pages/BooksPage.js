@@ -2,15 +2,14 @@ import React, {useState, useContext, useCallback, useEffect} from 'react'
 import {useHttp} from "../hooks/http.hook"
 import {AuthContext} from "../context/AuthContext"
 import {Loader} from "../components/Loader"
-import {LinksList} from "../components/LinksList"
-//import {BooksList} from "../components/BookList"
+import {BooksList} from "../components/BookList"
 import jwtDecode from "jwt-decode"
 import {useHistory} from "react-router-dom";
 
 
-export const LinksPage = () => {
+export const BooksPage = () => {
     const history = useHistory()
-    const [links, setLinks] = useState([])
+    const [books, setBooks] = useState([])
     const {loading, request} = useHttp()
     const {token} = useContext(AuthContext)
     const { exp } = jwtDecode(token)
@@ -21,27 +20,25 @@ export const LinksPage = () => {
         history.push('/')
     }
 
-    const fetchLinks = useCallback(async () => {
+    const fetchBooks = useCallback(async () => {
         try {
-            const fetched = await request('/api/link', 'GET', null, {
+            const fetched = await request('/api/book', 'GET', null, {
                 Authorization: `Bearer ${token}`
             })
-            setLinks(fetched)
-        } catch (e) {
-            console.log(token)
-        }
+            setBooks(fetched)
+        } catch (e) {}
     }, [token, request])
 
     useEffect(() => {
-        fetchLinks()
-    }, [fetchLinks])
+        fetchBooks()
+    }, [fetchBooks])
 
     if (loading){
         return <Loader />
     }
     return (
         <>
-            {!loading && <LinksList links={links} />}
+            {!loading && <BooksList books={books} />}
         </>
     )
 }

@@ -28,9 +28,7 @@ router.post('/create',auth,async (req, res) => {
         const newBook = new Book({
             book:book, author:author, link, max_available_chapter, last_readed_chapter, code, owner: req.user.userId
         })
-        console.log(newBook)
         await newBook.save()
-
         res.status(201).json({newBook})
 
     } catch (e) {
