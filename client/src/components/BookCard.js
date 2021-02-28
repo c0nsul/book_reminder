@@ -9,7 +9,7 @@ export const BookCard = ({book}) => {
             <p>Last author's chapter:  <span>{book.max_available_chapter}</span></p>
             <p>Last chapter you read:  <span>{book.bolast_readed_chapterok}</span></p>
             <p>Total:  <span>{book.total}</span></p>
-            <p>Overal read progres:  <span>???</span></p>
+            <p>Overall read progress:  <span>???</span></p>
             <p>Creation date: <strong>{new Date(book.date).toLocaleDateString()}</strong></p>
         </>
     )

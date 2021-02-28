@@ -2,14 +2,14 @@ import React, {useState, useContext, useCallback, useEffect} from 'react'
 import {useHttp} from "../hooks/http.hook"
 import {AuthContext} from "../context/AuthContext"
 import {Loader} from "../components/Loader"
-import {BooksList} from "../components/BookList"
+import {BooksLib} from "../components/BooksLib"
 import jwtDecode from "jwt-decode"
-import {useHistory} from "react-router-dom";
+import {useHistory} from "react-router-dom"
 
-
-export const BooksPage = () => {
+export const BooksLibPage = () => {
     const history = useHistory()
     const [books, setBooks] = useState([])
+    const [reload, setReload] = useState(false)
     const {loading, request} = useHttp()
     const {token} = useContext(AuthContext)
     const { exp } = jwtDecode(token)
@@ -19,26 +19,39 @@ export const BooksPage = () => {
         history.push('/')
     }
 
-    const fetchBooks = useCallback(async () => {
+    const addHandler = async (event, id) => {
+        event.preventDefault()
+
         try {
-            const fetched = await request('/api/book/mybooks', 'GET', null, {
+            await request(`/api/book/add/${id}`, 'POST', null, {
                 Authorization: `Bearer ${token}`
             })
-            //console.log(fetched)
+            setReload(true)
+        } catch (e) {}
+
+         console.log(id)
+    }
+
+    const fetchBooks = useCallback(async () => {
+        try {
+            const fetched = await request('/api/book/bookslib', 'GET', null, {
+                Authorization: `Bearer ${token}`
+            })
             setBooks(fetched)
+            setReload(false)
         } catch (e) {}
     }, [token, request])
 
     useEffect(() => {
         fetchBooks()
-    }, [fetchBooks])
+    }, [fetchBooks, reload])
 
     if (loading){
         return <Loader />
     }
     return (
         <>
-            {!loading && <BooksList books={books} token={token} request={request} />}
+            {!loading && <BooksLib books={books} addHandler={addHandler} />}
         </>
     )
 }

@@ -3,10 +3,10 @@ const {Schema, model, Types} = require('mongoose')
 const schema = new Schema({
     book: {type: String, required: true},
     author: {type: String, required: true},
+    desc: {type: String, required: true},
     link: {type: String, required: true},
     code: {type: String, required: true, unique: true},
     max_available_chapter: {type: String, required: true},
-    last_readed_chapter: {type: String, required: false},
     total: {type: String, required: true}, //total chapters when book is finaly writed by author
     date: {type: Date, default: Date.now},
     owner: {type: Types.ObjectId, ref: 'User'}

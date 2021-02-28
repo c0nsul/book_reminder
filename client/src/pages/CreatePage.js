@@ -71,6 +71,20 @@ export const CreatePage = () => {
 
                         <div className="input-field">
                             <input
+                                required="1"
+                                placeholder="Short description"
+                                id="desc"
+                                type="text"
+                                name="desc"
+                                className="yellow-input"
+                                value={form.desc}
+                                onChange={changeHandler}
+                            />
+                            <label htmlFor="book">Short description</label>
+                        </div>
+
+                        <div className="input-field">
+                            <input
                                 placeholder="Author"
                                 id="author"
                                 type="text"
