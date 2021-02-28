@@ -1,6 +1,4 @@
 const {Router} = require('express')
-//lodash
-const _ = require( 'lodash' )
 //shortid
 const shortid = require('shortid')
 //validator
@@ -52,16 +50,19 @@ router.post('/create',auth,async (req, res) => {
 //get all possible books
 router.get('/bookslib', auth, async (req, res) => {
     try {
+        //all books
         const libBooks = await Book.find()
 
-        //get mybooks
+        //my books
         const myBooks = await BookUser.find({user: req.user.userId})
 
         //add flag 'already in my books'
         if (libBooks && myBooks) {
-            for (let i = 0; i < libBooks.length; i++) { //проходимся по первому масиву
-                for (let j = 0; j< myBooks.length; j++) { // ищем соотвествия во втором массиве
+            for (let i = 0; i < libBooks.length; i++) {
+                for (let j = 0; j< myBooks.length; j++) {
+                    //if my book present in library
                     if (JSON.stringify(libBooks[i]._id) === JSON.stringify(myBooks[j].book)){
+                        //mark book as existed
                         libBooks[i]=Object.assign({}, libBooks[i]._doc, {exist: 1})
                     }
                 }
@@ -80,12 +81,15 @@ router.get('/bookslib', auth, async (req, res) => {
 //2 get books data acording book
 router.get('/mybooks', auth, async (req, res) => {
     try {
+        //my books
+        const myBooks = await BookUser.find({user: req.user.userId})
+        const ids = myBooks.map(item => item.book);
 
-        //get user data from middleware
-        const books = await Book.find({owner: req.user.userId})
-        //const allUserBooks = await BookUser.find({user: req.user.userId})
-        //console.log(allUserBooks)
+        //all books
+        const books = await Book.find({'_id': ids})
+
         res.json(books)
+
     } catch (e) {
         res.status(500).json({message: 'Something goes wrong, please try again!'})
     }
@@ -106,7 +110,7 @@ router.post('/delete/:id', auth, async (req, res) => {
         BookUser.deleteOne({book: req.params.id})
         res.status(200)
     } catch (e) {
-        res.status(500).json({message: 'Deleting goes wrong, please try again!'})
+        res.status(500).json({message: 'Deleting book from my lib goes wrong, please try again!'})
     }
 })
 
@@ -123,7 +127,7 @@ router.post('/add/:id', auth, async (req, res) => {
 
         res.status(200)
     } catch (e) {
-        res.status(500).json({message: 'Deleting goes wrong, please try again!'})
+        res.status(500).json({message: 'Adding book ti my lib goes wrong, please try again!'})
     }
 })
 
