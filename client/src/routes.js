@@ -10,7 +10,7 @@ export const useRoutes = isAuthenticated => {
     if (isAuthenticated) {
         return (
             <Switch>
-                <Route path="/books" exact>
+                <Route path="/mybooks" exact>
                     <BooksPage />
                 </Route>
                 <Route path="/booksLib" exact>
@@ -22,7 +22,7 @@ export const useRoutes = isAuthenticated => {
                 <Route path="/detail/:id">
                     <DetailPage />
                 </Route>
-                <Redirect to="/create" />
+                <Redirect to="/mybooks" />
             </Switch>
         )
     }

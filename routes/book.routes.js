@@ -14,9 +14,11 @@ const router = Router()
 router.post('/create',auth,async (req, res) => {
     try {
 
-        const {book, desc, author, link, max_available_chapter,last_readed_chapter} = req.body
+        const {book, desc, author, link, max_available_chapter,last_readed_chapter, total} = req.body
         const code = shortid.generate()
-        const total = '100?'
+        if (!total) {
+          let total = 100
+        }
 
         if (!book || !author || !link || !max_available_chapter || !last_readed_chapter){
             return res.status(400).json({message: 'Please fill all fields'})
@@ -68,27 +70,26 @@ router.get('/bookslib', auth, async (req, res) => {
                 }
             }
         }
-
         res.json(libBooks)
     } catch (e) {
-        res.status(500).json({message: 'Something goes wrong, please try again!'})
+        res.status(500).json({message: 'Getting libs book goes wrong, please try again!'})
     }
 })
 
 //get user books
-//todo:
-//1. books by user
-//2 get books data acording book
 router.get('/mybooks', auth, async (req, res) => {
     try {
+
         //my books
         const myBooks = await BookUser.find({user: req.user.userId})
+        //books ids
         const ids = myBooks.map(item => item.book);
 
-        //all books
+        //all my books by ID
         const books = await Book.find({'_id': ids})
-
         res.json(books)
+
+
 
     } catch (e) {
         res.status(500).json({message: 'Something goes wrong, please try again!'})
@@ -97,17 +98,42 @@ router.get('/mybooks', auth, async (req, res) => {
 
 router.get('/:id', auth, async (req, res) => {
     try {
-        const book = await Book.findById(req.params.id)
+        let  book = await Book.findById(req.params.id)
+
+        //my books
+        const bookDetail = await BookUser.find({user: req.user.userId, book: req.params.id})
+            const last_readed_chapter = bookDetail.map(item=>item.last_readed_chapter) || 0
+            const itemID = bookDetail.map(item=>item._id)
+
+        book=Object.assign({}, book._doc, {'last_readed_chapter': last_readed_chapter.toString()})
+        book=Object.assign({}, book, {'item_id': itemID.toString()})
+        //console.log(book)
+
         res.json(book)
     } catch (e) {
         res.status(500).json({message: 'Something goes wrong, please try again!'})
     }
 })
 
+router.post('/updatestat/:id', auth, async (req, res) => {
+    try {
+        const {last_readed_chapter} = req.body
+
+        const filter = {  _id: req.params.id }
+        const newvalues = {$set: { last_readed_chapter: last_readed_chapter } }
+        await BookUser.updateOne(filter, newvalues)
+        res.json(null)
+        res.status(200)
+    } catch (e) {
+        res.status(500).json({message: 'Details updaiting goes wrong, please try again!'})
+    }
+})
+
 //bookUser delete
 router.post('/delete/:id', auth, async (req, res) => {
     try {
-        BookUser.deleteOne({book: req.params.id})
+        await BookUser.deleteOne({book: req.params.id})
+        res.json(null)
         res.status(200)
     } catch (e) {
         res.status(500).json({message: 'Deleting book from my lib goes wrong, please try again!'})
@@ -117,7 +143,6 @@ router.post('/delete/:id', auth, async (req, res) => {
 //bookUser add
 router.post('/add/:id', auth, async (req, res) => {
     try {
-
         //add book to user
         const newReader = new BookUser({
                 book: req.params.id, user:req.user.userId
@@ -125,6 +150,7 @@ router.post('/add/:id', auth, async (req, res) => {
         )
         await newReader.save()
 
+        res.json(null)
         res.status(200)
     } catch (e) {
         res.status(500).json({message: 'Adding book ti my lib goes wrong, please try again!'})

@@ -135,6 +135,19 @@ export const CreatePage = () => {
                             />
                             <label htmlFor="last_readed_chapter">Last chapter you read</label>
                         </div>
+
+                        <div className="input-field">
+                            <input
+                                placeholder="Total chapters (if book was finished by author)"
+                                id="total"
+                                type="text"
+                                name="total"
+                                className="yellow-input"
+                                value={form.total}
+                                onChange={changeHandler}
+                            />
+                            <label htmlFor="last_readed_chapter">Total chapters  </label>
+                        </div>
                     </div>
                 </div>
                 <div className="card-action">

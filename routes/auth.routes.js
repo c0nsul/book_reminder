@@ -21,11 +21,12 @@ router.post(
     ],
     async (req, res) => {
     try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()){
+        const errorsArray = validationResult(req)
+        if (!errorsArray.isEmpty()){
+            msg = errorsArray.errors.map(item =>'</br>'+item.msg)
             return res.status(400).json({
-                errors: errors.array(),
-                message: 'Incorrect registration data'
+                errors: errorsArray.array(),
+                message: msg+'</br></br>' || 'Email or password incorrect!'
             })
         }
         const {email, password} = req.body
@@ -47,15 +48,16 @@ router.post(
 router.post('/login',
     [
         check('email', 'Incorrect email').normalizeEmail().isEmail(),
-        check('password', 'Empty password').exists()
+        check('password', 'Empty password').notEmpty()
     ],
     async (req, res) => {
     try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()){
+        const errorsArray = validationResult(req)
+        msg = errorsArray.errors.map(item =>'</br>'+item.msg)
+        if (!errorsArray.isEmpty()){
             return res.status(400).json({
-                errors: errors.array(),
-                message: 'Incorrect login data'
+                errors: errorsArray.array(),
+                message: msg+'</br></br>' || 'Incorrect login data'
             })
         }
 

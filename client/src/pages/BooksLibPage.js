@@ -21,16 +21,12 @@ export const BooksLibPage = () => {
 
     const addHandler = async (event, id) => {
         event.preventDefault()
-
         try {
-            const added = await request(`/api/book/add/${id}`, 'POST', null, {
+            await request(`/api/book/add/${id}`, 'POST', null, {
                 Authorization: `Bearer ${token}`
             })
             setReload(true)
-            console.log(id)
-        } catch (e) {
-            console.log('error!')
-        }
+        } catch (e) {}
     }
 
     const fetchBooks = useCallback(async () => {
@@ -40,13 +36,12 @@ export const BooksLibPage = () => {
             })
             setBooks(fetched)
             setReload(false)
-            console.log('fetching')
         } catch (e) {}
-    }, [token, request, reload])
+    }, [token, request])
 
     useEffect(() => {
         fetchBooks()
-    }, [fetchBooks])
+    }, [fetchBooks, reload])
 
     if (loading){
         return <Loader />

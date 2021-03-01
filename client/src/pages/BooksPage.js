@@ -10,13 +10,27 @@ import {useHistory} from "react-router-dom";
 export const BooksPage = () => {
     const history = useHistory()
     const [books, setBooks] = useState([])
+    const [reload, setReload] = useState(false)
     const {loading, request} = useHttp()
-    const {token} = useContext(AuthContext)
+    const auth = useContext(AuthContext)
+    const token = auth.token
+
     const { exp } = jwtDecode(token)
     const expirationTime = (exp * 1000) - 360000
 
     if (Date.now() >= expirationTime) {
+        auth.logout()
         history.push('/')
+    }
+
+    const delHandler = async (event,id) => {
+        event.preventDefault()
+        try {
+            await request(`/api/book/delete/${id}`, 'POST', null, {
+                Authorization: `Bearer ${token}`
+            })
+            setReload(true)
+        } catch (e) {}
     }
 
     const fetchBooks = useCallback(async () => {
@@ -24,21 +38,21 @@ export const BooksPage = () => {
             const fetched = await request('/api/book/mybooks', 'GET', null, {
                 Authorization: `Bearer ${token}`
             })
-            //console.log(fetched)
             setBooks(fetched)
+            setReload(false)
         } catch (e) {}
     }, [token, request])
 
     useEffect(() => {
         fetchBooks()
-    }, [fetchBooks])
+    }, [fetchBooks, reload])
 
     if (loading){
         return <Loader />
     }
     return (
         <>
-            {!loading && <BooksList books={books} token={token} request={request} />}
+            {!loading && <BooksList books={books} delHandler={delHandler} />}
         </>
     )
 }
