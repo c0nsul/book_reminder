@@ -11,9 +11,11 @@ export const BooksLibPage = () => {
     const [books, setBooks] = useState([])
     const [reload, setReload] = useState(false)
     const {loading, request} = useHttp()
-    const {token} = useContext(AuthContext)
+    const {token, role} = useContext(AuthContext)
     const { exp } = jwtDecode(token)
     const expirationTime = (exp * 1000) - 360000
+
+
 
     if (Date.now() >= expirationTime) {
         history.push('/')
@@ -48,7 +50,7 @@ export const BooksLibPage = () => {
     }
     return (
         <>
-            {!loading && <BooksLib books={books} addHandler={addHandler} />}
+            {!loading && <BooksLib books={books} admin={role} addHandler={addHandler} />}
         </>
     )
 }

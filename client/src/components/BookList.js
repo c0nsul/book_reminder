@@ -13,7 +13,7 @@ export const BooksList = ({books, delHandler}) => {
                 <th>N</th>
                 <th>Book<br/>Author</th>
                 <th>Total<br/>Available</th>
-                <th>Your chapter</th>
+                <th>Last<br/>read</th>
                 <th>URL</th>
                 <th>URL</th>
                 <th>Action</th>

@@ -7,7 +7,7 @@ const schema = new Schema({
     link: {type: String, required: true},
     code: {type: String, required: true, unique: true},
     max_available_chapter: {type: String, required: true},
-    total: {type: String, required: true}, //total chapters when book is finaly writed by author
+    total: {type: String, required: true},
     date: {type: Date, default: Date.now},
     owner: {type: Types.ObjectId, ref: 'User'}
 })

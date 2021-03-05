@@ -15,9 +15,10 @@ router.post('/create',auth,async (req, res) => {
     try {
 
         const {book, desc, author, link, max_available_chapter,last_readed_chapter, total} = req.body
+
         const code = shortid.generate()
         if (!total) {
-          let total = 100
+          let total = 30
         }
 
         if (!book || !author || !link || !max_available_chapter || !last_readed_chapter){
@@ -79,18 +80,25 @@ router.get('/bookslib', auth, async (req, res) => {
 //get user books
 router.get('/mybooks', auth, async (req, res) => {
     try {
-
         //my books
         const myBooks = await BookUser.find({user: req.user.userId})
         //books ids
         const ids = myBooks.map(item => item.book);
 
         //all my books by ID
-        const books = await Book.find({'_id': ids})
+        let books = await Book.find({'_id': ids})
+
+        if (books && myBooks) {
+            for (let i = 0; i < books.length; i++) {
+                for (let j = 0; j < myBooks.length; j++) {
+                    if (JSON.stringify(books[i]._id) === JSON.stringify(myBooks[j].book)){
+                        books[i]=Object.assign({}, books[i]._doc, {last_readed_chapter:myBooks[j].last_readed_chapter||0})
+                    }
+                }
+            }
+        }
+
         res.json(books)
-
-
-
     } catch (e) {
         res.status(500).json({message: 'Something goes wrong, please try again!'})
     }
@@ -102,16 +110,36 @@ router.get('/:id', auth, async (req, res) => {
 
         //my books
         const bookDetail = await BookUser.find({user: req.user.userId, book: req.params.id})
+        //console.log(bookDetail)
+        if (bookDetail.length > 0){
             const last_readed_chapter = bookDetail.map(item=>item.last_readed_chapter) || 0
             const itemID = bookDetail.map(item=>item._id)
-
-        book=Object.assign({}, book._doc, {'last_readed_chapter': last_readed_chapter.toString()})
-        book=Object.assign({}, book, {'item_id': itemID.toString()})
+            book=Object.assign({}, book._doc, {'last_readed_chapter': last_readed_chapter.toString()})
+            book=Object.assign({}, book, {'item_id': itemID.toString()})
+        } else {
+            console.log(12356)
+            book=Object.assign({}, book._doc, {'last_readed_chapter': 'no'})
+        }
         //console.log(book)
-
         res.json(book)
     } catch (e) {
         res.status(500).json({message: 'Something goes wrong, please try again!'})
+    }
+})
+
+//update book
+router.post('/update/:id', auth, async (req, res) => {
+    try {
+        const {book, desc, author, link, max_available_chapter, total} = req.body
+
+        const filter = {  _id: req.params.id }
+        const newValues = {$set: {book, desc, author, link, max_available_chapter, total}}
+        await Book.updateOne(filter, newValues)
+
+        res.json(null)
+        res.status(200)
+    } catch (e) {
+        res.status(500).json({message: 'Book update goes wrong, please try again!'})
     }
 })
 
@@ -120,8 +148,8 @@ router.post('/updatestat/:id', auth, async (req, res) => {
         const {last_readed_chapter} = req.body
 
         const filter = {  _id: req.params.id }
-        const newvalues = {$set: { last_readed_chapter: last_readed_chapter } }
-        await BookUser.updateOne(filter, newvalues)
+        const newValues = {$set: { last_readed_chapter: last_readed_chapter } }
+        await BookUser.updateOne(filter, newValues)
         res.json(null)
         res.status(200)
     } catch (e) {

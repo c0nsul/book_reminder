@@ -8,14 +8,14 @@ import {Loader} from "./components/Loader";
 import 'materialize-css'
 
 function App() {
-    const {token, login, logout, userId, ready} = useAuth()
+    const {token, login, logout, userId, ready, role} = useAuth()
     const isAuthenticated = !!token
     const routes = useRoutes(isAuthenticated)
     if (!ready){
         return <Loader />
     }
     return (
-        <AuthContext.Provider value={{token,login,logout,userId,isAuthenticated}}>
+        <AuthContext.Provider value={{token,login,logout,userId,isAuthenticated, role}}>
             <Router>
                 {isAuthenticated && <Navbar/>}
                 <div className="container">

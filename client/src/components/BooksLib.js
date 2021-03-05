@@ -1,7 +1,7 @@
 import React from "react"
 import {Link} from "react-router-dom"
 
-export const BooksLib = ({books, addHandler}) => {
+export const BooksLib = ({books, addHandler, admin}) => {
 
     if (!books.length){
         return <p className="center">Library is empty</p>
@@ -36,6 +36,12 @@ export const BooksLib = ({books, addHandler}) => {
                         ) : (
                             <td><button onClick={(e)=>addHandler(e,book._id)} className="waves-effect waves-light red btn-small">Add</button></td>
                         )}
+
+                        {admin === 'admin' &&
+                        <td><Link to={`/update/${book._id}`}
+                                  className="waves-effect waves-light red btn-small">UPDATE</Link></td>
+                        }
+
                     </tr>
                 )
             })}

@@ -36,8 +36,10 @@ router.post(
         }
         //encrypting data
         const hashedPassword = await bcrypt.hash(password, 12)
-        const user = new User ({email, password: hashedPassword})
+        const role = 'reader'
+        const user = new User ({email, password: hashedPassword, role})
         await user.save()
+
         res.status(201).json({message: 'User Created Successfully'})
     } catch (e){
         res.status(500).json({message: 'Something goes wrong, please try again!'})
@@ -73,11 +75,11 @@ router.post('/login',
         }
 
         const token = jwt.sign(
-            {userId: user.id},
+            {userId: user.id, role: user.role },
             config.get('jwtSecret'),
             {expiresIn: '1h'}
         )
-        res.json({token, userId: user.id})
+        res.json({token, userId: user.id, role: user.role})
     } catch (e){
         res.status(500).json({message: 'Something goes wrong, please try again!'})
     }

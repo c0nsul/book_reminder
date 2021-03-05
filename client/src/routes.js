@@ -5,6 +5,8 @@ import {BooksLibPage} from "./pages/BooksLibPage"
 import {CreatePage} from "./pages/CreatePage"
 import {DetailPage} from "./pages/DetailPage"
 import {AuthPage} from "./pages/AuthPage"
+import {UpdatePage} from "./pages/UpdatePage"
+
 
 export const useRoutes = isAuthenticated => {
     if (isAuthenticated) {
@@ -18,6 +20,9 @@ export const useRoutes = isAuthenticated => {
                 </Route>
                 <Route path="/create" exact>
                     <CreatePage />
+                </Route>
+                <Route path="/update/:id" >
+                    <UpdatePage />
                 </Route>
                 <Route path="/detail/:id">
                     <DetailPage />

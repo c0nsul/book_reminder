@@ -21,9 +21,6 @@ export const DetailPage = () => {
         history.push('/')
     }
 
-    useEffect(()=> {
-        window.M.updateTextFields()
-    })
 
     const updateHandler = async (event,id,chapter) => {
         event.preventDefault()
@@ -42,10 +39,11 @@ export const DetailPage = () => {
             })
             setBook(fetched)
         } catch (e) {}
-    }, [token, request])
+    }, [token, request, bookId])
 
     useEffect(() => {
         getBook()
+        window.M.updateTextFields()
     }, [getBook])
 
     if(loading) {

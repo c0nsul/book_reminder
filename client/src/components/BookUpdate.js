@@ -1,60 +1,21 @@
-import React, {useContext, useEffect, useState} from 'react'
-import {useHttp} from "../hooks/http.hook"
-import {AuthContext} from "../context/AuthContext"
-import {useHistory} from "react-router-dom"
-import {useMessage} from "../hooks/message.hook"
-import jwtDecode from "jwt-decode"
+import React, {useEffect, useState} from 'react'
 
-
-export const CreatePage = () => {
-    const history = useHistory()
-    const auth = useContext(AuthContext)
-    const message = useMessage()
-    const [form, setForm] = useState({
-        author: '', book: '', link: '', max_available_chapter: '', last_readed_chapter: '', total: '', desc: ''
-    })
-    const {loading, request, error, clearError} = useHttp()
-    const {exp} = jwtDecode(auth.token)
-
-    const expirationTime = (exp * 1000) - 360000
-
-    if (Date.now() >= expirationTime) {
-        auth.logout()
-        history.push('/')
-    }
-
-    useEffect(() => {
-        message(error)
-        clearError()
-    }, [error, message, clearError])
-
-    //fix css and design after start page (labels + names)
-    useEffect(() => {
-        window.M.updateTextFields()
-    })
-
+export const BookUpdate = ({book, updateHandler, loading}) => {
+    const [form, setForm] = useState(book)
     const changeHandler = event => {
         setForm({...form, [event.target.name]: event.target.value})
     }
+    //console.log(form)
 
-
-    const createHandler = async (event) => {
-        event.preventDefault()
-        try {
-            const data = await request('/api/book/create', 'POST', {...form}, {
-                Authorization: `Bearer ${auth.token}`
-            })
-            message(data.message)
-            history.push(`/detail/${data.newBook._id}`)
-        } catch (e) {
-        }
-    }
+    useEffect(() => {
+        window.M.updateTextFields()
+    }, [])
 
     return (
         <div className="row">
             <div className="card blue-grey darken-1">
                 <div className="card-content white-text">
-                    <span className="card-title">Create new book reminder</span>
+                    <span className="card-title">Update book: </span>
                     <p>&nbsp;</p>
                     <div>
                         <div className="input-field">
@@ -72,16 +33,18 @@ export const CreatePage = () => {
                         </div>
 
                         <div className="input-field">
-                            <input
+                            <textarea
                                 required="1"
                                 placeholder="Short description"
                                 id="desc"
-                                type="text"
+                                rows="20"
+                                cols="20"
                                 name="desc"
+                                defaultValue={form.desc}
                                 className="yellow-input"
-                                value={form.desc}
                                 onChange={changeHandler}
-                            />
+                            >
+                            </textarea>
                             <label htmlFor="book">Short description</label>
                         </div>
 
@@ -127,19 +90,6 @@ export const CreatePage = () => {
 
                         <div className="input-field">
                             <input
-                                placeholder="Last chapter you read"
-                                id="last_readed_chapter"
-                                type="text"
-                                name="last_readed_chapter"
-                                className="yellow-input"
-                                value={form.last_readed_chapter}
-                                onChange={changeHandler}
-                            />
-                            <label htmlFor="last_readed_chapter">Last chapter you read</label>
-                        </div>
-
-                        <div className="input-field">
-                            <input
                                 placeholder="Total chapters (if book was finished by author)"
                                 id="total"
                                 type="text"
@@ -156,10 +106,10 @@ export const CreatePage = () => {
                     <button
                         className="btn yellow darken-4"
                         style={{marginRight: 10}}
-                        onClick={createHandler}
+                        onClick={(e)=>updateHandler(e, form)}
                         disabled={loading}
                     >
-                        Create
+                        Update
                     </button>
 
 
