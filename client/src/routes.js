@@ -6,12 +6,20 @@ import {CreatePage} from "./pages/CreatePage"
 import {DetailPage} from "./pages/DetailPage"
 import {AuthPage} from "./pages/AuthPage"
 import {UpdatePage} from "./pages/UpdatePage"
+import {HomePage} from "./pages/HomePage"
+import {AuthorPage} from "./pages/AuthorPage"
 
 
 export const useRoutes = isAuthenticated => {
     if (isAuthenticated) {
         return (
             <Switch>
+                <Route path="/author/:id" exact>
+                    <AuthorPage />
+                </Route>
+                <Route path="/home" exact>
+                    <HomePage />
+                </Route>
                 <Route path="/mybooks" exact>
                     <BooksPage />
                 </Route>
@@ -27,7 +35,7 @@ export const useRoutes = isAuthenticated => {
                 <Route path="/detail/:id">
                     <DetailPage />
                 </Route>
-                <Redirect to="/mybooks" />
+                <Redirect to="/home" />
             </Switch>
         )
     }

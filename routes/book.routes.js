@@ -6,6 +6,7 @@ const {check, validationResult} = require('express-validator')
 //model
 const Book = require('../models/Book')
 const BookUser = require('../models/BookUser')
+const Author = require('../models/Author')
 //auth middleware
 const auth = require('../middleware/auth.middleware')
 //router
@@ -13,26 +14,27 @@ const router = Router()
 
 router.post('/create',auth,async (req, res) => {
     try {
-
-        const {book, desc, author, link, max_available_chapter,last_readed_chapter, total} = req.body
-
-        const code = shortid.generate()
-        if (!total) {
-          let total = 30
-        }
+        const {book, desc, author, link, max_available_chapter,last_readed_chapter} = req.body
+        const total = req.body.total > 0 ? req.body.total : 30
 
         if (!book || !author || !link || !max_available_chapter || !last_readed_chapter){
             return res.status(400).json({message: 'Please fill all fields'})
         }
 
-        const existing = await Book.findOne({book})
-        if (existing) {
-            return res.json({newBook: existing})
+        const existingBook = await Book.findOne({book})
+        if (existingBook) {
+            return res.status(400).json({message: 'Book already exist in library!'})
+        }
+
+        let bookAuthor = await Author.findOne({name:author})
+        if (bookAuthor === null) {
+            bookAuthor = new Author({name:author, code:shortid.generate()})
+            await bookAuthor.save()
         }
 
         //add new book
         const newBook = new Book({
-            desc:desc, total:total, book:book, author:author, link, max_available_chapter, code, owner: req.user.userId
+            name:book, author_id:bookAuthor._id, desc:desc,link:link, code:shortid.generate(),max_available_chapter, total, added_by: req.user.userId
         })
         await newBook.save()
 
@@ -54,7 +56,7 @@ router.post('/create',auth,async (req, res) => {
 router.get('/bookslib', auth, async (req, res) => {
     try {
         //all books
-        const libBooks = await Book.find()
+        const libBooks = await Book.find().populate("author_id")
 
         //my books
         const myBooks = await BookUser.find({user: req.user.userId})
@@ -86,7 +88,7 @@ router.get('/mybooks', auth, async (req, res) => {
         const ids = myBooks.map(item => item.book);
 
         //all my books by ID
-        let books = await Book.find({'_id': ids})
+        let books = await Book.find({'_id': ids}).populate("author_id")
 
         if (books && myBooks) {
             for (let i = 0; i < books.length; i++) {

@@ -6,27 +6,28 @@ import {Loader} from "../components/Loader"
 import {BookCard} from "../components/BookCard"
 import jwtDecode from "jwt-decode"
 import {useHistory} from "react-router-dom"
+import {useMessage} from "../hooks/message.hook";
 
 export const DetailPage = () => {
-    const {token} = useContext(AuthContext)
+    const auth = useContext(AuthContext)
     const {request, loading} = useHttp()
     const [book, setBook] = useState(null)
     const bookId = useParams().id
     const history = useHistory()
-    const { exp } = jwtDecode(token)
+    const { exp } = jwtDecode(auth.token)
     const expirationTime = (exp * 1000) - 360000
+    const message = useMessage()
 
     if (Date.now() >= expirationTime) {
-        token.logout()
+        auth.logout()
         history.push('/')
     }
-
 
     const updateHandler = async (event,id,chapter) => {
         event.preventDefault()
         try {
             await request(`/api/book/updatestat/${id}`, 'POST', {last_readed_chapter:chapter}, {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${auth.token}`
             })
             history.push('/mybooks')
         } catch (e) {}
@@ -35,11 +36,12 @@ export const DetailPage = () => {
     const getBook = useCallback(async ()=>{
         try {
             const fetched =  await request(`/api/book/${bookId}`, 'GET', null, {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${auth.token}`
             })
+            message(fetched.message)
             setBook(fetched)
         } catch (e) {}
-    }, [token, request, bookId])
+    }, [auth.token, request, bookId, message])
 
     useEffect(() => {
         getBook()

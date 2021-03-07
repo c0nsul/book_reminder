@@ -5,6 +5,7 @@ import {Loader} from "../components/Loader"
 import {BooksLib} from "../components/BooksLib"
 import jwtDecode from "jwt-decode"
 import {useHistory} from "react-router-dom"
+import {useMessage} from "../hooks/message.hook";
 
 export const BooksLibPage = () => {
     const history = useHistory()
@@ -14,8 +15,7 @@ export const BooksLibPage = () => {
     const {token, role} = useContext(AuthContext)
     const { exp } = jwtDecode(token)
     const expirationTime = (exp * 1000) - 360000
-
-
+    const message = useMessage()
 
     if (Date.now() >= expirationTime) {
         history.push('/')
@@ -36,10 +36,11 @@ export const BooksLibPage = () => {
             const fetched = await request('/api/book/bookslib', 'GET', null, {
                 Authorization: `Bearer ${token}`
             })
+            message(fetched.message)
             setBooks(fetched)
             setReload(false)
         } catch (e) {}
-    }, [token, request])
+    }, [token, request,message])
 
     useEffect(() => {
         fetchBooks()

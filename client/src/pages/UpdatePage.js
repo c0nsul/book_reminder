@@ -27,7 +27,7 @@ export const UpdatePage = () => {
     const updateHandler = async (event, form) => {
         event.preventDefault()
         try {
-            const data = await request(`/api/book/update/${bookId}`, 'POST', {...form}, {
+            await request(`/api/book/update/${bookId}`, 'POST', {...form}, {
                 Authorization: `Bearer ${auth.token}`
             })
             history.push(`/detail/${bookId}`)
@@ -42,7 +42,7 @@ export const UpdatePage = () => {
             })
             setBook(fetched)
         } catch (e) {}
-    }, [request, bookId])
+    }, [request, bookId, auth.token])
 
     useEffect(() => {
         message(error)

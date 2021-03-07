@@ -41,14 +41,16 @@ export const AuthPage = () => {
 
     return (
         <div className="row">
+            <h4>
+                Books Reminder
+            </h4>
             <div className="col s7 offset-3">
-                <h2>
-                    Books Reminder
-                </h2>
+
                 <div className="card blue darken-1">
                     <div className="card-content white-text">
-                        <span className="card-title">Auth</span>
+                        <span className="card-title">Authorisation</span>
                         <div>
+                            &nbsp;
                             <div className="input-field">
                                 <input
                                     placeholder="Email"

@@ -18,6 +18,7 @@ export const Navbar = () => {
             <div className="nav-wrapper blue darken-1" style={{padding: '0 2rem'}}>
                 <span className="brand-logo">Books reminder</span>
                 <ul id="nav-mobile" className="right hide-on-med-and-down">
+                    <li><NavLink to="/home">Home</NavLink></li>
                     <li><NavLink to="/create">Create</NavLink></li>
                     <li><NavLink to="/mybooks">My Books</NavLink></li>
                     <li><NavLink to="/bookslib">Library</NavLink></li>

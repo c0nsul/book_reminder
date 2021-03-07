@@ -26,7 +26,10 @@ export const BooksList = ({books, delHandler}) => {
                 return (
                     <tr key={book._id}>
                         <td>{index +1}</td>
-                        <td style={{width:250}}>{book.book}<br/>{book.author}</td>
+                        <td style={{width:250}}>{book.name}<br/>
+                            <td><Link to={`/author/${book.author_id._id}`} >{book.author_id.name}</Link></td>
+
+                        </td>
                         <td>{book.total}<br/>{book.max_available_chapter}</td>
                         <td>{book.last_readed_chapter}</td>
                         <td><a href={book.link} target="_blank" rel="noopener noreferrer" className="waves-effect waves-light btn-small">Read</a></td>
