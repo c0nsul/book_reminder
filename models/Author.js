@@ -4,7 +4,7 @@ const schema = new Schema({
     name: {type: String, required: true},
     code: {type: String, required: true, unique: true},
     date: {type: Date, default: Date.now},
-    books: [{type: Types.ObjectId, ref: 'Book'}],
+    books: {type: Types.ObjectId, ref: 'Book'},
     added_by: {type: Types.ObjectId, ref: 'User'}
 })
 

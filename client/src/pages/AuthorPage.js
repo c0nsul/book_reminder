@@ -3,16 +3,28 @@ import {useHttp} from "../hooks/http.hook"
 import {Loader} from "../components/Loader"
 import {AuthContext} from "../context/AuthContext"
 import {useMessage} from "../hooks/message.hook"
-import {useParams} from "react-router-dom"
+import {useHistory, useParams} from "react-router-dom"
 import {AuthorCard} from "../components/AuthorCard"
+import jwtDecode from "jwt-decode";
 
 
 export const AuthorPage = () => {
     const message = useMessage()
+    const history = useHistory()
     const authorId = useParams().id
-    const {token} = useContext(AuthContext)
+    const auth = useContext(AuthContext)
+    const token = auth.token
     const {request, loading} = useHttp()
     const [author, setAuthor] = useState(null)
+    const [books, setBooks] = useState(null)
+    const { exp } = jwtDecode(token)
+    const expirationTime = (exp * 1000) - 360000
+
+    if (Date.now() >= expirationTime) {
+        auth.logout()
+        history.push('/')
+    }
+
 
     const getAuthor = useCallback(async ()=>{
         try {
@@ -20,7 +32,12 @@ export const AuthorPage = () => {
                 Authorization: `Bearer ${token}`
             })
             message(found.message)
-            setAuthor(found)
+            const authorData = found.map(item=>item.author)
+            setAuthor(authorData[0])
+
+            const booksData = found.map(item=>item.books)
+            setBooks(booksData[0])
+
         } catch (e) {}
     }, [token, request, authorId, message])
 
@@ -35,7 +52,7 @@ export const AuthorPage = () => {
 
     return (
         <>
-            {!loading && author && <AuthorCard author={author} />}
+            {!loading && author && <AuthorCard author={author} books={books} />}
         </>
     )
 }
